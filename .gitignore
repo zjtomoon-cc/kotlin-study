@@ -4,3 +4,5 @@
 *.class
 .gradle/
 build/
+node_modules/
+bin/

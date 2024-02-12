@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Built-By: ChenHeng
+Build-Jdk: 11.0.1
+Implementation-Title: ch3_1 Maven Webapp
+Implementation-Version: 0.0.1-SNAPSHOT
+Implementation-Vendor-Id: com.maven.demo
+Implementation-URL: http://maven.apache.org
+Created-By: Maven Integration for Eclipse
+

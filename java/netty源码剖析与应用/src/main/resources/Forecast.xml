@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sf.inc.clickhouse.mapper.ChDeliveryMapper">
+    <resultMap id="delivery" type="com.sf.inc.oewm.entity.Delivery">
+        <result column="days" property="preDate"></result>
+        <result column="src_city" property="pickCity"></result>
+        <result column="dest_city" property="deliverCity"></result>
+        <result column="src_area" property="pickArea"></result>
+        <result column="dest_area" property=" deliverArea"></result>
+        <result column="cn" property="preNum"></result>
+        <result column="cn20" property="pre20KgNum"></result>
+        <result column="product_type_code" property="prodType"></result>
+        <result column="baseCns" property="baseCns"></result>
+    </resultMap>
+    <select id="queryByParam" parameterType="map" resultMap="delivery">
+        select
+        t1.days as days,t1.src_city as src_city,t1.dest_city as dest_city,
+        t1.src_area as src_area, t1.dest_area as dest_area，
+        sum(t1.cn) as cn,sum(t1.cn20) as cn20,
+        <if test="groupKey=='product_type_code' ">
+            product_type_code,
+        </if>
+        (select avg(t2.cn),avg(t2.cn20) from dm_predict_cityflow_weight_product_history_d_etl as t2
+        where t2.src_city=src_city and t2.dest_city=dest_city and
+        t2.days <![CDATA[ >= ]]>#{baseStartDay} and t2.days <![CDATA[ <= ]]>#{baseEndDay})
+        as baseCns
+        from dm_predict_yanhua_cityflow_weight_product_prediction_d_etl as t1
+        where t1.days <![CDATA[ >= ]]>#{startDay} and t1.days <![CDATA[ <= ]]>#{endDay}
+        <if test="src_city!=null ">
+            and t1.src_city= #{src_city}
+        </if>
+        <if test="dest_city!=null ">
+            and t1.dest_city= #{dest_city}
+        </if>
+        <if test="src_hq!=null ">
+            and t1.src_hq= #{src_hq}
+        </if>
+        <if test="dest_hq!=null ">
+            and t1.dest_hq= #{dest_hq}
+        </if>
+        <if test="src_fbq!=null ">
+            and t1.src_fbq= #{src_fbq}
+        </if>
+        <if test="dest_fbq!=null ">
+            and t1.dest_fbq= #{dest_fbq}
+        </if>
+        <if test="src_area!=null ">
+            and t1.src_area= #{src_area}
+        </if>
+        <if test="dest_area!=null ">
+            and t1.dest_area= #{dest_area}
+        </if>
+        group by days,src_city,dest_city,src_area,dest_area
+        <if test="groupKey=='product_type_code' ">
+            product_type_code,
+        </if>
+        <if test="isNotExport!=null ">
+            order by days asc ,dest_area asc
+        </if>
+        limit #{skip} , #{size}
+    </select>
+    <select id="queryCountByParam" parameterType="map" resultType="int">
+        select count(0) from (
+        select
+        t1.days
+        from dm_predict_yanhua_cityflow_weight_product_prediction_d_etl as t1
+        where t1.days <![CDATA[ >= ]]>#{startDay} and t1.days <![CDATA[ <= ]]>#{endDay}
+        <if test="src_city!=null ">
+            and t1.src_city= #{src_city}
+        </if>
+        <if test="dest_city!=null ">
+            and t1.dest_city= #{dest_city}
+        </if>
+        <if test="src_hq!=null ">
+            and t1.src_hq= #{src_hq}
+        </if>
+        <if test="dest_hq!=null ">
+            and t1.dest_hq= #{dest_hq}
+        </if>
+        <if test="src_fbq!=null ">
+            and t1.src_fbq= #{src_fbq}
+        </if>
+        <if test="dest_fbq!=null ">
+            and t1.dest_fbq= #{dest_fbq}
+        </if>
+        <if test="src_area!=null ">
+            and t1.src_area= #{src_area}
+        </if>
+        <if test="dest_area!=null ">
+            and t1.dest_area= #{dest_area}
+        </if>
+        group by days,src_city,dest_city,src_area,dest_area
+        <if test="groupKey=='product_type_code' ">
+            product_type_code,
+        </if>
+        )
+    </select>
+
+</mapper>
